@@ -3,466 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hamburgada do Careca - Cardápio & Pedidos</title>
+  <title>Hamburgada do Careca</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <style>
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .snap-x-mandatory { scroll-snap-type: x mandatory; }
-    .snap-center-item { scroll-snap-align: center; }
-
-    /* Tela de Abertura (Splash Screen) */
-    #splash {
-      position: fixed;
-      inset: 0;
-      background-color: #09090b;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-      transition: opacity 0.6s ease;
-    }
-    .splash-logo {
-      font-size: 28px;
-      font-weight: 900;
-      color: #fff;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-    .splash-sub {
-      color: #f59e0b;
-      font-size: 15px;
-      font-weight: bold;
-      letter-spacing: 0.5px;
-    }
-    .spinner {
-      width: 38px;
-      height: 38px;
-      border: 3px solid #27272a;
-      border-top: 3px solid #f59e0b;
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      margin-top: 30px;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-  </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen pb-28 font-sans selection:bg-amber-500 selection:text-black">
+<body class="bg-zinc-950 text-zinc-100 min-h-screen pb-28 font-sans">
 
-  <!-- Tela de Abertura / Splash Screen (3 segundos) -->
-  <div id="splash">
-    <div class="splash-logo">🍔 Hamburgada<br>do Careca</div>
-    <div class="splash-sub">Preparando o seu sonho...</div>
-    <div class="spinner"></div>
-  </div>
-
-  <!-- Header -->
-  <header class="relative bg-zinc-900 border-b border-zinc-800">
-    <div class="max-w-4xl mx-auto px-4 py-6 text-center">
-      <div class="inline-block p-1 bg-gradient-to-tr from-amber-500 to-yellow-400 rounded-full mb-3 shadow-lg shadow-amber-500/20">
-        <div class="bg-zinc-950 p-3 rounded-full">
-          <i class="fa-solid font-bold text-3xl text-amber-500 fa-burger"></i>
-        </div>
-      </div>
-      <h1 class="text-3xl font-extrabold tracking-tight text-white uppercase">Hamburgada do Careca</h1>
-      <p class="text-zinc-400 text-sm mt-1">Hambúrguer artesanal com sabor de verdade! 🍔🔥</p>
-
-      <div class="mt-4 flex flex-wrap justify-center items-center gap-2">
-        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Aberto Agora
-        </span>
-        <a href="https://instagram.com/hamburgada_do_carecaa" target="_blank" class="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-300 hover:text-amber-400 border border-zinc-700 flex items-center gap-1.5 transition">
-          <i class="fa-brands fa-instagram"></i> @hamburgada_do_carecaa
-        </a>
-      </div>
-    </div>
-
-    <!-- Abas de Navegação -->
-    <div class="flex justify-center border-t border-zinc-800/80 bg-zinc-950/60 backdrop-blur sticky top-0 z-30">
-      <button onclick="switchTab('burgers')" id="tab-burgers" class="px-5 py-3 text-sm font-bold text-amber-400 border-b-2 border-amber-500 flex items-center gap-2 transition">
-        <i class="fa-solid fa-burger"></i> Hambúrgueres
-      </button>
-      <button onclick="switchTab('drinks')" id="tab-drinks" class="px-5 py-3 text-sm font-bold text-zinc-400 border-b-2 border-transparent hover:text-zinc-200 flex items-center gap-2 transition">
-        <i class="fa-solid fa-wine-bottle"></i> Bebidas
-      </button>
-      <button onclick="switchTab('info')" id="tab-info" class="px-5 py-3 text-sm font-bold text-zinc-400 border-b-2 border-transparent hover:text-zinc-200 flex items-center gap-2 transition">
-        <i class="fa-solid fa-circle-info"></i> Info & Pix
-      </button>
-    </div>
+  <header class="bg-zinc-900 border-b border-zinc-800 p-6 text-center">
+    <h1 class="text-3xl font-extrabold text-white uppercase">🍔 Hamburgada do Careca</h1>
+    <p class="text-zinc-400 text-sm mt-1">Hambúrguer artesanal de respeito! 🔥</p>
   </header>
 
-  <main class="max-w-4xl mx-auto px-4 py-6">
-
-    <!-- SEÇÃO: HAMBÚRGUERES -->
-    <section id="sec-burgers" class="space-y-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <span>🍔</span> Nossos Hambúrgueres
-          </h2>
-          <p class="text-xs text-zinc-400">Deslize para o lado para ver todas as opções</p>
-        </div>
-        <div class="text-xs text-amber-400 font-medium flex items-center gap-1">
-          <i class="fa-solid fa-hand-pointer animate-bounce"></i> Arraste &rarr;
-        </div>
+  <main class="max-w-4xl mx-auto p-4 space-y-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex justify-between items-center">
+      <div>
+        <h3 class="text-lg font-bold text-white">Hambúrguer do Chef</h3>
+        <p class="text-xs text-zinc-400">Pão brioche, 150g bovino, gorgonzola, bacon e fritas.</p>
+        <span class="text-xl font-black text-amber-400 mt-2 block">R$ 35,00</span>
       </div>
-
-      <div class="flex gap-4 overflow-x-auto snap-x-mandatory no-scrollbar py-2 -mx-4 px-4">
-        
-        <!-- Lanche 1: Do Chef -->
-        <div class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative group">
-          <div class="absolute top-3 right-3 bg-amber-500 text-black text-xs font-black px-2.5 py-1 rounded-full uppercase">
-            Top Seller
-          </div>
-          <div>
-            <h3 class="text-lg font-extrabold text-white">Hambúrguer do Chef</h3>
-            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-              Pão brioche, hambúrguer bovino 150g, tomate, alface, queijo mussarela, queijo gorgonzola, cebola caramelizada, bacon e maionese da casa.
-            </p>
-            <div class="mt-3 text-xs text-amber-400 font-semibold flex items-center gap-1">
-              <i class="fa-solid fa-utensils"></i> Acompanha fritas
-            </div>
-          </div>
-          <div class="mt-6 flex items-center justify-between pt-4 border-t border-zinc-800">
-            <span class="text-xl font-black text-white">R$ 35,00</span>
-            <button onclick="addToCart('Hambúrguer do Chef', 35.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 active:scale-95">
-              <i class="fa-solid fa-plus"></i> Adicionar
-            </button>
-          </div>
-        </div>
-
-        <!-- Lanche 2: Do Careca -->
-        <div class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative group">
-          <div>
-            <h3 class="text-lg font-extrabold text-white">Hambúrguer do Careca</h3>
-            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-              Pão brioche, hambúrguer bovino 150g, tomate, alface, queijo mussarela, cheddar, bacon e maionese da casa.
-            </p>
-            <div class="mt-3 text-xs text-amber-400 font-semibold flex items-center gap-1">
-              <i class="fa-solid fa-utensils"></i> Acompanha fritas
-            </div>
-          </div>
-          <div class="mt-6 flex items-center justify-between pt-4 border-t border-zinc-800">
-            <span class="text-xl font-black text-white">R$ 30,00</span>
-            <button onclick="addToCart('Hambúrguer do Careca', 30.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 active:scale-95">
-              <i class="fa-solid fa-plus"></i> Adicionar
-            </button>
-          </div>
-        </div>
-
-        <!-- Lanche 3: Clássico -->
-        <div class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative group">
-          <div>
-            <h3 class="text-lg font-extrabold text-white">Hambúrguer Clássico</h3>
-            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-              Pão brioche, hambúrguer bovino 150g, tomate, alface, queijo mussarela e maionese da casa.
-            </p>
-            <div class="mt-3 text-xs text-amber-400 font-semibold flex items-center gap-1">
-              <i class="fa-solid fa-utensils"></i> Acompanha fritas
-            </div>
-          </div>
-          <div class="mt-6 flex items-center justify-between pt-4 border-t border-zinc-800">
-            <span class="text-xl font-black text-white">R$ 25,00</span>
-            <button onclick="addToCart('Hambúrguer Clássico', 25.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 active:scale-95">
-              <i class="fa-solid fa-plus"></i> Adicionar
-            </button>
-          </div>
-        </div>
-
-        <!-- Lanche 4: Kids -->
-        <div class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative group">
-          <div>
-            <h3 class="text-lg font-extrabold text-white">Carequinha Kids</h3>
-            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-              Pão brioche, hambúrguer bovino 150g e queijo mussarela.
-            </p>
-            <div class="mt-3 text-xs text-amber-400 font-semibold flex items-center gap-1">
-              <i class="fa-solid fa-utensils"></i> Acompanha fritas
-            </div>
-          </div>
-          <div class="mt-6 flex items-center justify-between pt-4 border-t border-zinc-800">
-            <span class="text-xl font-black text-white">R$ 15,00</span>
-            <button onclick="addToCart('Carequinha Kids', 15.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 active:scale-95">
-              <i class="fa-solid fa-plus"></i> Adicionar
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- SEÇÃO: BEBIDAS -->
-    <section id="sec-drinks" class="space-y-4 mt-8 hidden">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
-        <span>🥤</span> Bebidas
-      </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between">
-          <div>
-            <h3 class="font-bold text-white">Guaraná 2L</h3>
-            <p class="text-xs text-zinc-400">Garrafa 2 Litros</p>
-            <span class="text-amber-400 font-bold text-sm mt-1 block">R$ 10,00</span>
-          </div>
-          <button onclick="addToCart('Guaraná 2L', 10.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold p-2.5 rounded-xl transition active:scale-95">
-            <i class="fa-solid fa-plus"></i>
-          </button>
-        </div>
-
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between">
-          <div>
-            <h3 class="font-bold text-white">Coca-Cola 2L</h3>
-            <p class="text-xs text-zinc-400">Garrafa 2 Litros</p>
-            <span class="text-amber-400 font-bold text-sm mt-1 block">R$ 15,00</span>
-          </div>
-          <button onclick="addToCart('Coca-Cola 2L', 15.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold p-2.5 rounded-xl transition active:scale-95">
-            <i class="fa-solid fa-plus"></i>
-          </button>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- SEÇÃO: INFO -->
-    <section id="sec-info" class="space-y-4 mt-8 hidden">
-      <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-3">
-          <i class="fa-solid fa-store text-amber-500"></i> Informações da Hamburgueria
-        </h3>
-        
-        <div class="text-xs text-zinc-300 space-y-2">
-          <p class="flex items-start gap-2">
-            <i class="fa-solid fa-location-dot text-amber-500 mt-0.5"></i>
-            <span>Rua 6 de Novembro, 660 - Mário Quintana, Porto Alegre - RS</span>
-          </p>
-          <p class="flex items-center gap-2">
-            <i class="fa-solid fa-clock text-amber-500"></i>
-            <span>Terça a Domingo: 18:00 - 23:00 (Segunda: Fechado)</span>
-          </p>
-          <p class="flex items-center gap-2">
-            <i class="fa-solid fa-phone text-amber-500"></i>
-            <span>(51) 9816-3012</span>
-          </p>
-        </div>
-
-        <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 text-center space-y-2 mt-4">
-          <p class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Chave Pix (E-mail)</p>
-          <p class="text-amber-400 font-mono text-sm font-bold select-all">hamburgueriacarecas@gmail.com</p>
-          <button onclick="copyPix()" class="bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition border border-zinc-700 inline-flex items-center gap-2">
-            <i class="fa-solid fa-copy"></i> Copiar Chave Pix
-          </button>
-          <div id="pix-toast" class="text-xs text-emerald-400 font-semibold hidden">
-            ✓ Chave Pix copiada com sucesso!
-          </div>
-        </div>
-      </div>
-    </section>
-
+      <button onclick="addToCart('Hambúrguer do Chef', 35.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded-xl text-sm">
+        <i class="fa-solid fa-plus"></i> Adicionar
+      </button>
+    </div>
   </main>
 
-  <!-- BARRA DO CARRINHO -->
-  <div id="cart-bar" class="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 p-4 shadow-2xl z-40">
-    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
-      <div>
-        <span class="text-xs text-zinc-400 block">Total do Pedido</span>
-        <span id="cart-total" class="text-xl font-black text-amber-400">R$ 0,00</span>
-        <span id="cart-count" class="text-xs text-zinc-500 ml-1">(0 itens)</span>
-      </div>
-      <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-3 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95">
-        <i class="fa-brands fa-whatsapp text-lg"></i> Finalizar Pedido
-      </button>
+  <div class="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 p-4 flex justify-between items-center z-40">
+    <div>
+      <span class="text-xs text-zinc-400 block">Total</span>
+      <span id="cart-total" class="text-xl font-black text-amber-400">R$ 0,00</span>
     </div>
-  </div>
-
-  <!-- MODAL DE CHECKOUT -->
-  <div id="checkout-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
-        <h3 class="text-lg font-bold text-white">Finalizar pelo WhatsApp</h3>
-        <button onclick="closeModal()" class="text-zinc-400 hover:text-white text-xl">&times;</button>
-      </div>
-
-      <div id="modal-summary" class="bg-zinc-950 p-3 rounded-xl text-xs space-y-1 text-zinc-300 border border-zinc-800">
-      </div>
-
-      <div class="space-y-3">
-        <div>
-          <label class="text-xs font-semibold text-zinc-400 block mb-1">Seu Nome *</label>
-          <input type="text" id="cust-name" placeholder="Ex: Dominique" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
-        </div>
-
-        <div>
-          <label class="text-xs font-semibold text-zinc-400 block mb-1">Tipo de Pedido</label>
-          <select id="order-type" onchange="toggleAddress()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
-            <option value="Entrega">Entrega (Tele-entrega)</option>
-            <option value="Retirada">Retirada no Local</option>
-          </select>
-        </div>
-
-        <div id="address-group">
-          <label class="text-xs font-semibold text-zinc-400 block mb-1">Endereço de Entrega *</label>
-          <input type="text" id="cust-address" placeholder="Rua, número e bairro" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
-        </div>
-
-        <div>
-          <label class="text-xs font-semibold text-zinc-400 block mb-1">Forma de Pagamento</label>
-          <select id="pay-method" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
-            <option value="Pix">Pix (hamburgueriacarecas@gmail.com)</option>
-            <option value="Cartão">Cartão</option>
-            <option value="Dinheiro">Dinheiro</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-xs font-semibold text-zinc-400 block mb-1">Observações (Opcional)</label>
-          <input type="text" id="cust-obs" placeholder="Ex: Sem salada, troco pra 50, etc." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
-        </div>
-      </div>
-
-      <button onclick="sendWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm transition flex items-center justify-center gap-2">
-        <i class="fa-brands fa-whatsapp text-lg"></i> Enviar Pedido no Whats
-      </button>
-    </div>
+    <button onclick="sendWhatsApp()" class="bg-emerald-600 text-white font-bold px-5 py-3 rounded-xl text-sm flex items-center gap-2">
+      <i class="fa-brands fa-whatsapp text-lg"></i> Finalizar Pedido
+    </button>
   </div>
 
   <script>
-    // Fecha a tela de abertura perfeitamente após 3 segundos
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        const splash = document.getElementById('splash');
-        if (splash) {
-          splash.style.opacity = '0';
-          setTimeout(function() {
-            splash.style.display = 'none';
-          }, 600);
-        }
-      }, 3000);
-    });
-
     let cart = [];
-
-    function switchTab(tab) {
-      document.getElementById('sec-burgers').classList.add('hidden');
-      document.getElementById('sec-drinks').classList.add('hidden');
-      document.getElementById('sec-info').classList.add('hidden');
-
-      document.getElementById('tab-burgers').className = "px-5 py-3 text-sm font-bold text-zinc-400 border-b-2 border-transparent hover:text-zinc-200 flex items-center gap-2 transition";
-      document.getElementById('tab-drinks').className = "px-5 py-3 text-sm font-bold text-zinc-400 border-b-2 border-transparent hover:text-zinc-200 flex items-center gap-2 transition";
-      document.getElementById('tab-info').className = "px-5 py-3 text-sm font-bold text-zinc-400 border-b-2 border-transparent hover:text-zinc-200 flex items-center gap-2 transition";
-
-      if (tab === 'burgers') {
-        document.getElementById('sec-burgers').classList.remove('hidden');
-        document.getElementById('tab-burgers').className = "px-5 py-3 text-sm font-bold text-amber-400 border-b-2 border-amber-500 flex items-center gap-2 transition";
-      } else if (tab === 'drinks') {
-        document.getElementById('sec-drinks').classList.remove('hidden');
-        document.getElementById('tab-drinks').className = "px-5 py-3 text-sm font-bold text-amber-400 border-b-2 border-amber-500 flex items-center gap-2 transition";
-      } else if (tab === 'info') {
-        document.getElementById('sec-info').classList.remove('hidden');
-        document.getElementById('tab-info').className = "px-5 py-3 text-sm font-bold text-amber-400 border-b-2 border-amber-500 flex items-center gap-2 transition";
-      }
-    }
-
     function addToCart(name, price) {
-      const existing = cart.find(item => item.name === name);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cart.push({ name, price, qty: 1 });
-      }
-      updateCartUI();
+      cart.push({ name, price });
+      document.getElementById('cart-total').innerText = 'R$ ' + price.toFixed(2).replace('.', ',');
     }
-
-    function updateCartUI() {
-      const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-      const count = cart.reduce((acc, item) => acc + item.qty, 0);
-
-      document.getElementById('cart-total').innerText = 'R$ ' + total.toFixed(2).replace('.', ',');
-      document.getElementById('cart-count').innerText = '(' + count + ' ' + (count === 1 ? 'item' : 'itens') + ')';
-    }
-
-    function openModal() {
-      if (cart.length === 0) {
-        alert('Selecione pelo menos um item do cardápio!');
-        return;
-      }
-
-      let summaryHtml = '<p class="font-bold text-amber-400 mb-1">Itens Selecionados:</p>';
-      cart.forEach(item => {
-        summaryHtml += '<div class="flex justify-between"><span>' + item.qty + 'x ' + item.name + '</span><span>R$ ' + (item.price * item.qty).toFixed(2).replace('.', ',') + '</span></div>';
-      });
-      document.getElementById('modal-summary').innerHTML = summaryHtml;
-      document.getElementById('checkout-modal').classList.remove('hidden');
-    }
-
-    function closeModal() {
-      document.getElementById('checkout-modal').classList.add('hidden');
-    }
-
-    function toggleAddress() {
-      const type = document.getElementById('order-type').value;
-      const group = document.getElementById('address-group');
-      if (type === 'Retirada') {
-        group.classList.add('hidden');
-      } else {
-        group.classList.remove('hidden');
-      }
-    }
-
-    function copyPix() {
-      navigator.clipboard.writeText('hamburgueriacarecas@gmail.com');
-      const toast = document.getElementById('pix-toast');
-      toast.classList.remove('hidden');
-      setTimeout(function() {
-        toast.classList.add('hidden');
-      }, 3000);
-    }
-
     function sendWhatsApp() {
-      const name = document.getElementById('cust-name').value.trim();
-      const type = document.getElementById('order-type').value;
-      const address = document.getElementById('cust-address').value.trim();
-      const pay = document.getElementById('pay-method').value;
-      const obs = document.getElementById('cust-obs').value.trim();
-
-      if (!name) {
-        alert('Por favor, informe seu nome.');
+      if (cart.length === 0) {
+        alert('Selecione um lanche primeiro!');
         return;
       }
-
-      if (type === 'Entrega' && !address) {
-        alert('Por favor, informe o endereço de entrega.');
-        return;
-      }
-
       let msg = "╔═══════════════════════╗\n";
       msg += "     🍔 *NOVO PEDIDO* 🍔\n";
       msg += "   *Hamburgada do Careca*\n";
       msg += "╚═══════════════════════╝\n\n";
-      
-      msg += "👤 *Cliente:* " + name + "\n";
-      msg += "🛵 *Tipo:* " + type + "\n";
-      if (type === 'Entrega') msg += "📍 *Endereço:* " + address + "\n";
-      msg += "💳 *Pagamento:* " + pay + "\n";
-      if (obs) msg += "💬 *Obs:* " + obs + "\n";
-      
-      msg += "\n━━━━━━━━━━━━━━━━━━━━━\n";
       msg += "🛒 *ITENS DO PEDIDO:*\n";
-      let total = 0;
       cart.forEach(item => {
-        const sub = item.price * item.qty;
-        total += sub;
-        msg += "• " + item.qty + "x " + item.name + " — R$ " + sub.toFixed(2).replace('.', ',') + "\n";
+        msg += "• 1x " + item.name + " — R$ " + item.price.toFixed(2).replace('.', ',') + "\n";
       });
-      msg += "━━━━━━━━━━━━━━━━━━━━━\n";
-
-      msg += "\n💰 *TOTAL: R$ " + total.toFixed(2).replace('.', ',') + "*";
-
-      const encoded = encodeURIComponent(msg);
-      window.open("https://api.whatsapp.com/send?phone=555198163012&text=" + encoded, "_blank");
+      msg += "\n💰 *TOTAL: R$ 35,00*";
+      window.open("https://api.whatsapp.com/send?phone=555198163012&text=" + encodeURIComponent(msg), "_blank");
     }
   </script>
 </body>
