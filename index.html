@@ -13,7 +13,7 @@
     .snap-center-item { scroll-snap-align: center; }
   </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen pb-28 font-sans selection:bg-amber-500 selection:text-black">
+<body class="bg-zinc-950 text-zinc-100 min-h-screen pb-44 font-sans selection:bg-amber-500 selection:text-black">
 
   <!-- Header -->
   <header class="relative bg-zinc-900 border-b border-zinc-800">
@@ -214,17 +214,21 @@
 
   </main>
 
-  <!-- BARRA DO CARRINHO -->
-  <div id="cart-bar" class="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 p-4 shadow-2xl z-40">
-    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
-      <div>
-        <span class="text-xs text-zinc-400 block">Total do Pedido</span>
-        <span id="cart-total" class="text-xl font-black text-amber-400">R$ 0,00</span>
-        <span id="cart-count" class="text-xs text-zinc-500 ml-1">(0 itens)</span>
+  <!-- BARRA DO CARRINHO COM LISTA E BOTÃO DE REMOVER -->
+  <div id="cart-bar" class="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 p-3 sm:p-4 shadow-2xl z-40">
+    <div class="max-w-4xl mx-auto space-y-2.5">
+      <div id="cart-items-list" class="max-h-28 overflow-y-auto space-y-1.5 pr-1 hidden"></div>
+
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <span class="text-xs text-zinc-400 block">Total do Pedido</span>
+          <span id="cart-total" class="text-xl font-black text-amber-400">R$ 0,00</span>
+          <span id="cart-count" class="text-xs text-zinc-500 ml-1">(0 itens)</span>
+        </div>
+        <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-3 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95">
+          <i class="fa-brands fa-whatsapp text-lg"></i> Finalizar Pedido
+        </button>
       </div>
-      <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-3 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95">
-        <i class="fa-brands fa-whatsapp text-lg"></i> Finalizar Pedido
-      </button>
     </div>
   </div>
 
@@ -288,12 +292,10 @@
 
     function updateOpenStatus() {
       const now = new Date();
-      const day = now.getDay(); // 0 = Dom, 1 = Seg, ..., 6 = Sab
+      const day = now.getDay();
       const minutes = now.getHours() * 60 + now.getMinutes();
-      const openMin = 18 * 60; // 18:00
-      const closeMin = 23 * 60; // 23:00
+      const isOpen = day !== 1 && minutes >= 18 * 60 && minutes < 23 * 60;
 
-      const isOpen = day !== 1 && minutes >= openMin && minutes < closeMin;
       const badge = document.getElementById('open-status');
       const dot = document.getElementById('status-dot');
       const text = document.getElementById('status-text');
@@ -326,7 +328,7 @@
       } else {
         cart.push({ name, price, qty: 1 });
       }
-      updateCartUI();
+      renderCartBar();
       renderSummary();
     }
 
@@ -336,17 +338,72 @@
       if (cart[index].qty <= 0) {
         cart.splice(index, 1);
       }
-      updateCartUI();
+      renderCartBar();
       renderSummary();
       if (cart.length === 0) closeModal();
     }
 
-    function updateCartUI() {
+    function removeItem(index) {
+      if (!cart[index]) return;
+      cart.splice(index, 1);
+      renderCartBar();
+      renderSummary();
+      if (cart.length === 0) closeModal();
+    }
+
+    function renderCartBar() {
       const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
       const count = cart.reduce((acc, item) => acc + item.qty, 0);
 
       document.getElementById('cart-total').innerText = 'R$ ' + total.toFixed(2).replace('.', ',');
       document.getElementById('cart-count').innerText = '(' + count + ' ' + (count === 1 ? 'item' : 'itens') + ')';
+
+      const listEl = document.getElementById('cart-items-list');
+      listEl.innerHTML = '';
+
+      if (cart.length === 0) {
+        listEl.classList.add('hidden');
+        return;
+      }
+
+      listEl.classList.remove('hidden');
+
+      cart.forEach((item, idx) => {
+        const line = document.createElement('div');
+        line.className = 'flex items-center justify-between bg-zinc-950/90 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'text-zinc-200 font-medium truncate';
+        nameSpan.textContent = `${item.qty}x ${item.name} — R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}`;
+
+        const controls = document.createElement('div');
+        controls.className = 'flex items-center gap-1.5 shrink-0';
+
+        const minusBtn = document.createElement('button');
+        minusBtn.type = 'button';
+        minusBtn.className = 'w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-white font-bold';
+        minusBtn.title = 'Diminuir quantidade';
+        minusBtn.textContent = '-';
+        minusBtn.onclick = () => changeQty(idx, -1);
+
+        const plusBtn = document.createElement('button');
+        plusBtn.type = 'button';
+        plusBtn.className = 'w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-white font-bold';
+        plusBtn.title = 'Aumentar quantidade';
+        plusBtn.textContent = '+';
+        plusBtn.onclick = () => changeQty(idx, 1);
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'w-6 h-6 rounded bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 font-bold flex items-center justify-center';
+        delBtn.title = 'Retirar item';
+        delBtn.innerHTML = '<i class="fa-solid fa-trash text-[11px]"></i>';
+        delBtn.onclick = () => removeItem(idx);
+
+        controls.append(minusBtn, plusBtn, delBtn);
+        line.append(nameSpan, controls);
+        listEl.appendChild(line);
+      });
     }
 
     function renderSummary() {
@@ -361,10 +418,10 @@
         left.textContent = `${item.qty}x ${item.name}`;
 
         const right = document.createElement('div');
-        right.className = 'flex items-center gap-2';
+        right.className = 'flex items-center gap-1.5';
 
         const sub = document.createElement('span');
-        sub.className = 'font-semibold text-white';
+        sub.className = 'font-semibold text-white mr-1';
         sub.textContent = 'R$ ' + (item.price * item.qty).toFixed(2).replace('.', ',');
 
         const minusBtn = document.createElement('button');
@@ -379,7 +436,13 @@
         plusBtn.textContent = '+';
         plusBtn.onclick = () => changeQty(idx, 1);
 
-        right.append(sub, minusBtn, plusBtn);
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'w-6 h-6 rounded bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 font-bold flex items-center justify-center';
+        delBtn.innerHTML = '<i class="fa-solid fa-trash text-[11px]"></i>';
+        delBtn.onclick = () => removeItem(idx);
+
+        right.append(sub, minusBtn, plusBtn, delBtn);
         row.append(left, right);
         container.appendChild(row);
       });
