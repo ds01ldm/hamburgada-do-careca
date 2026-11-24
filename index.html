@@ -11,9 +11,50 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .snap-x-mandatory { scroll-snap-type: x mandatory; }
     .snap-center-item { scroll-snap-align: center; }
+
+    @keyframes badgePop {
+      0% { transform: scale(0.75); }
+      55% { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes cardGlow {
+      0% { transform: translateY(0) scale(1); }
+      40% { transform: translateY(-3px) scale(1.012); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes floatTag {
+      0% { opacity: 0; transform: translate(-50%, 6px) scale(0.9); }
+      20% { opacity: 1; transform: translate(-50%, -4px) scale(1); }
+      80% { opacity: 1; transform: translate(-50%, -14px) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -22px) scale(0.95); }
+    }
+
+    .animate-badge-pop {
+      animation: badgePop 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .animate-card-glow {
+      animation: cardGlow 0.38s ease-out;
+    }
+
+    .floating-vibe {
+      position: fixed;
+      z-index: 60;
+      pointer-events: none;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+      animation: floatTag 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen pb-44 font-sans selection:bg-amber-500 selection:text-black">
+<body class="bg-zinc-950 text-zinc-100 min-h-screen pb-28 font-sans selection:bg-amber-500 selection:text-black">
 
   <!-- Header -->
   <header class="relative bg-zinc-900 border-b border-zinc-800">
@@ -67,12 +108,19 @@
         </div>
       </div>
 
-      <div class="flex gap-4 overflow-x-auto snap-x-mandatory no-scrollbar py-2 -mx-4 px-4">
-        
-        <div class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative">
-          <div class="absolute top-3 right-3 bg-amber-500 text-black text-xs font-black px-2.5 py-1 rounded-full uppercase">
-            Top Seller
+      <div class="flex gap-4 overflow-x-auto snap-x-mandatory no-scrollbar py-3 -mx-4 px-4">
+
+        <!-- Lanche 1: Do Chef -->
+        <div data-card="Hambúrguer do Chef" class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative transition-colors duration-300">
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <span class="bg-amber-500 text-black text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase">
+              Top Seller
+            </span>
+            <span data-qty-badge="Hambúrguer do Chef" class="hidden bg-emerald-500 text-black text-xs font-black px-2.5 py-0.5 rounded-full shadow">
+              +1
+            </span>
           </div>
+
           <div>
             <h3 class="text-lg font-extrabold text-white">Hambúrguer do Chef</h3>
             <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
@@ -82,15 +130,28 @@
               <i class="fa-solid fa-utensils"></i> Acompanha fritas
             </div>
           </div>
-          <div class="mt-6 flex items-center justify-between pt-4 border-t border-zinc-800">
+
+          <div class="mt-6 flex items-center justify-between gap-2 pt-4 border-t border-zinc-800">
             <span class="text-xl font-black text-white">R$ 35,00</span>
-            <button onclick="addToCart('Hambúrguer do Chef', 35.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 active:scale-95">
-              <i class="fa-solid fa-plus"></i> Adicionar
-            </button>
+            <div class="flex items-center gap-1.5">
+              <button type="button" data-remove-btn="Hambúrguer do Chef" onclick="removeOneFromCart('Hambúrguer do Chef', event)" class="hidden bg-zinc-800 hover:bg-rose-500/20 text-zinc-300 hover:text-rose-400 border border-zinc-700 hover:border-rose-500/40 font-bold px-2.5 py-1.5 rounded-xl text-xs transition active:scale-95">
+                Remover
+              </button>
+              <button type="button" onclick="addToCart('Hambúrguer do Chef', 35.00, event)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1 active:scale-95">
+                <i class="fa-solid fa-plus"></i> Adicionar
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative">
+        <!-- Lanche 2: Do Careca -->
+        <div data-card="Hambúrguer do Careca" class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative transition-colors duration-300">
+          <div class="flex items-center justify-end gap-2 mb-1 min-h-[22px]">
+            <span data-qty-badge="Hambúrguer do Careca" class="hidden bg-emerald-500 text-black text-xs font-black px-2.5 py-0.5 rounded-full shadow">
+              +1
+            </span>
+          </div>
+
           <div>
             <h3 class="text-lg font-extrabold text-white">Hambúrguer do Careca</h3>
             <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
@@ -100,15 +161,28 @@
               <i class="fa-solid fa-utensils"></i> Acompanha fritas
             </div>
           </div>
-          <div class="mt-6 flex items-center justify-between pt-4 border-t border-zinc-800">
+
+          <div class="mt-6 flex items-center justify-between gap-2 pt-4 border-t border-zinc-800">
             <span class="text-xl font-black text-white">R$ 30,00</span>
-            <button onclick="addToCart('Hambúrguer do Careca', 30.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 active:scale-95">
-              <i class="fa-solid fa-plus"></i> Adicionar
-            </button>
+            <div class="flex items-center gap-1.5">
+              <button type="button" data-remove-btn="Hambúrguer do Careca" onclick="removeOneFromCart('Hambúrguer do Careca', event)" class="hidden bg-zinc-800 hover:bg-rose-500/20 text-zinc-300 hover:text-rose-400 border border-zinc-700 hover:border-rose-500/40 font-bold px-2.5 py-1.5 rounded-xl text-xs transition active:scale-95">
+                Remover
+              </button>
+              <button type="button" onclick="addToCart('Hambúrguer do Careca', 30.00, event)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1 active:scale-95">
+                <i class="fa-solid fa-plus"></i> Adicionar
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative">
+        <!-- Lanche 3: Clássico -->
+        <div data-card="Hambúrguer Clássico" class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative transition-colors duration-300">
+          <div class="flex items-center justify-end gap-2 mb-1 min-h-[22px]">
+            <span data-qty-badge="Hambúrguer Clássico" class="hidden bg-emerald-500 text-black text-xs font-black px-2.5 py-0.5 rounded-full shadow">
+              +1
+            </span>
+          </div>
+
           <div>
             <h3 class="text-lg font-extrabold text-white">Hambúrguer Clássico</h3>
             <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
@@ -118,15 +192,28 @@
               <i class="fa-solid fa-utensils"></i> Acompanha fritas
             </div>
           </div>
-          <div class="mt-6 flex items-center justify-between pt-4 border-t border-zinc-800">
+
+          <div class="mt-6 flex items-center justify-between gap-2 pt-4 border-t border-zinc-800">
             <span class="text-xl font-black text-white">R$ 25,00</span>
-            <button onclick="addToCart('Hambúrguer Clássico', 25.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 active:scale-95">
-              <i class="fa-solid fa-plus"></i> Adicionar
-            </button>
+            <div class="flex items-center gap-1.5">
+              <button type="button" data-remove-btn="Hambúrguer Clássico" onclick="removeOneFromCart('Hambúrguer Clássico', event)" class="hidden bg-zinc-800 hover:bg-rose-500/20 text-zinc-300 hover:text-rose-400 border border-zinc-700 hover:border-rose-500/40 font-bold px-2.5 py-1.5 rounded-xl text-xs transition active:scale-95">
+                Remover
+              </button>
+              <button type="button" onclick="addToCart('Hambúrguer Clássico', 25.00, event)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1 active:scale-95">
+                <i class="fa-solid fa-plus"></i> Adicionar
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative">
+        <!-- Lanche 4: Kids -->
+        <div data-card="Carequinha Kids" class="snap-center-item min-w-[85%] sm:min-w-[320px] bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative transition-colors duration-300">
+          <div class="flex items-center justify-end gap-2 mb-1 min-h-[22px]">
+            <span data-qty-badge="Carequinha Kids" class="hidden bg-emerald-500 text-black text-xs font-black px-2.5 py-0.5 rounded-full shadow">
+              +1
+            </span>
+          </div>
+
           <div>
             <h3 class="text-lg font-extrabold text-white">Carequinha Kids</h3>
             <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
@@ -136,11 +223,17 @@
               <i class="fa-solid fa-utensils"></i> Acompanha fritas
             </div>
           </div>
-          <div class="mt-6 flex items-center justify-between pt-4 border-t border-zinc-800">
+
+          <div class="mt-6 flex items-center justify-between gap-2 pt-4 border-t border-zinc-800">
             <span class="text-xl font-black text-white">R$ 15,00</span>
-            <button onclick="addToCart('Carequinha Kids', 15.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 active:scale-95">
-              <i class="fa-solid fa-plus"></i> Adicionar
-            </button>
+            <div class="flex items-center gap-1.5">
+              <button type="button" data-remove-btn="Carequinha Kids" onclick="removeOneFromCart('Carequinha Kids', event)" class="hidden bg-zinc-800 hover:bg-rose-500/20 text-zinc-300 hover:text-rose-400 border border-zinc-700 hover:border-rose-500/40 font-bold px-2.5 py-1.5 rounded-xl text-xs transition active:scale-95">
+                Remover
+              </button>
+              <button type="button" onclick="addToCart('Carequinha Kids', 15.00, event)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1 active:scale-95">
+                <i class="fa-solid fa-plus"></i> Adicionar
+              </button>
+            </div>
           </div>
         </div>
 
@@ -153,27 +246,49 @@
         <span>🥤</span> Bebidas
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between">
+
+        <div data-card="Guaraná 2L" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between gap-3 relative transition-colors duration-300">
           <div>
-            <h3 class="font-bold text-white">Guaraná 2L</h3>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-white">Guaraná 2L</h3>
+              <span data-qty-badge="Guaraná 2L" class="hidden bg-emerald-500 text-black text-[11px] font-black px-2 py-0.5 rounded-full">
+                +1
+              </span>
+            </div>
             <p class="text-xs text-zinc-400">Garrafa 2 Litros</p>
             <span class="text-amber-400 font-bold text-sm mt-1 block">R$ 10,00</span>
           </div>
-          <button onclick="addToCart('Guaraná 2L', 10.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold p-2.5 rounded-xl transition active:scale-95">
-            <i class="fa-solid fa-plus"></i>
-          </button>
+          <div class="flex items-center gap-1.5">
+            <button type="button" data-remove-btn="Guaraná 2L" onclick="removeOneFromCart('Guaraná 2L', event)" class="hidden bg-zinc-800 hover:bg-rose-500/20 text-zinc-300 hover:text-rose-400 border border-zinc-700 font-bold px-2.5 py-1.5 rounded-xl text-xs transition active:scale-95">
+              Remover
+            </button>
+            <button type="button" onclick="addToCart('Guaraná 2L', 10.00, event)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1 active:scale-95">
+              <i class="fa-solid fa-plus"></i> Adicionar
+            </button>
+          </div>
         </div>
 
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between">
+        <div data-card="Coca-Cola 2L" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between gap-3 relative transition-colors duration-300">
           <div>
-            <h3 class="font-bold text-white">Coca-Cola 2L</h3>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-white">Coca-Cola 2L</h3>
+              <span data-qty-badge="Coca-Cola 2L" class="hidden bg-emerald-500 text-black text-[11px] font-black px-2 py-0.5 rounded-full">
+                +1
+              </span>
+            </div>
             <p class="text-xs text-zinc-400">Garrafa 2 Litros</p>
             <span class="text-amber-400 font-bold text-sm mt-1 block">R$ 15,00</span>
           </div>
-          <button onclick="addToCart('Coca-Cola 2L', 15.00)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold p-2.5 rounded-xl transition active:scale-95">
-            <i class="fa-solid fa-plus"></i>
-          </button>
+          <div class="flex items-center gap-1.5">
+            <button type="button" data-remove-btn="Coca-Cola 2L" onclick="removeOneFromCart('Coca-Cola 2L', event)" class="hidden bg-zinc-800 hover:bg-rose-500/20 text-zinc-300 hover:text-rose-400 border border-zinc-700 font-bold px-2.5 py-1.5 rounded-xl text-xs transition active:scale-95">
+              Remover
+            </button>
+            <button type="button" onclick="addToCart('Coca-Cola 2L', 15.00, event)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1 active:scale-95">
+              <i class="fa-solid fa-plus"></i> Adicionar
+            </button>
+          </div>
         </div>
+
       </div>
     </section>
 
@@ -183,7 +298,7 @@
         <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-3">
           <i class="fa-solid fa-store text-amber-500"></i> Informações da Hamburgueria
         </h3>
-        
+
         <div class="text-xs text-zinc-300 space-y-2">
           <p class="flex items-start gap-2">
             <i class="fa-solid fa-location-dot text-amber-500 mt-0.5"></i>
@@ -214,21 +329,17 @@
 
   </main>
 
-  <!-- BARRA DO CARRINHO COM LISTA E BOTÃO DE REMOVER -->
-  <div id="cart-bar" class="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 p-3 sm:p-4 shadow-2xl z-40">
-    <div class="max-w-4xl mx-auto space-y-2.5">
-      <div id="cart-items-list" class="max-h-28 overflow-y-auto space-y-1.5 pr-1 hidden"></div>
-
-      <div class="flex items-center justify-between gap-4">
-        <div>
-          <span class="text-xs text-zinc-400 block">Total do Pedido</span>
-          <span id="cart-total" class="text-xl font-black text-amber-400">R$ 0,00</span>
-          <span id="cart-count" class="text-xs text-zinc-500 ml-1">(0 itens)</span>
-        </div>
-        <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-3 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95">
-          <i class="fa-brands fa-whatsapp text-lg"></i> Finalizar Pedido
-        </button>
+  <!-- BARRA DO CARRINHO LIMPA -->
+  <div id="cart-bar" class="fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur border-t border-zinc-800 p-4 shadow-2xl z-40">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+      <div>
+        <span class="text-xs text-zinc-400 block">Total do Pedido</span>
+        <span id="cart-total" class="text-xl font-black text-amber-400">R$ 0,00</span>
+        <span id="cart-count" class="text-xs text-zinc-500 ml-1">(0 itens)</span>
       </div>
+      <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-3 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95">
+        <i class="fa-brands fa-whatsapp text-lg"></i> Finalizar Pedido
+      </button>
     </div>
   </div>
 
@@ -290,6 +401,39 @@
   <script>
     let cart = [];
 
+    const itemThemes = {
+      'Hambúrguer do Chef': {
+        label: '🧀 Gorgonzola + Bacon + Cebola',
+        border: 'border-amber-400/70',
+        pillBg: 'bg-amber-500 text-black'
+      },
+      'Hambúrguer do Careca': {
+        label: '🥓 Cheddar + Bacon do Careca',
+        border: 'border-orange-400/70',
+        pillBg: 'bg-orange-500 text-black'
+      },
+      'Hambúrguer Clássico': {
+        label: '🍔 Clássico Brioche + Maionese',
+        border: 'border-yellow-400/70',
+        pillBg: 'bg-yellow-400 text-black'
+      },
+      'Carequinha Kids': {
+        label: '🍟 Kids + Fritas Crocantes',
+        border: 'border-sky-400/70',
+        pillBg: 'bg-sky-400 text-black'
+      },
+      'Guaraná 2L': {
+        label: '🧊 Guaraná Geladão 2L',
+        border: 'border-lime-400/70',
+        pillBg: 'bg-lime-400 text-black'
+      },
+      'Coca-Cola 2L': {
+        label: '🧊 Coca Trincando 2L',
+        border: 'border-rose-400/70',
+        pillBg: 'bg-rose-500 text-white'
+      }
+    };
+
     function updateOpenStatus() {
       const now = new Date();
       const day = now.getDay();
@@ -321,89 +465,122 @@
       document.getElementById('tab-' + tab).className = "px-5 py-3 text-sm font-bold text-amber-400 border-b-2 border-amber-500 flex items-center gap-2 transition";
     }
 
-    function addToCart(name, price) {
+    function triggerCardEffect(name, event, isAdd = true) {
+      const card = document.querySelector(`[data-card="${CSS.escape(name)}"]`);
+      const theme = itemThemes[name] || {
+        label: isAdd ? '✓ Adicionado' : '− Removido',
+        border: 'border-amber-400/70',
+        pillBg: 'bg-amber-500 text-black'
+      };
+
+      if (card) {
+        card.classList.remove('animate-card-glow', 'border-zinc-800');
+        card.classList.add(theme.border);
+        void card.offsetWidth;
+        card.classList.add('animate-card-glow');
+
+        setTimeout(() => {
+          card.classList.remove(theme.border, 'animate-card-glow');
+          card.classList.add('border-zinc-800');
+        }, 550);
+      }
+
+      const badge = document.querySelector(`[data-qty-badge="${CSS.escape(name)}"]`);
+      if (badge) {
+        badge.classList.remove('animate-badge-pop');
+        void badge.offsetWidth;
+        badge.classList.add('animate-badge-pop');
+      }
+
+      const tag = document.createElement('div');
+      tag.className = `floating-vibe ${isAdd ? theme.pillBg : 'bg-zinc-800 text-rose-300 border border-rose-500/30'}`;
+      tag.textContent = isAdd ? `+1 • ${theme.label}` : `−1 • ${name}`;
+
+      let x = window.innerWidth / 2;
+      let y = window.innerHeight * 0.65;
+
+      if (event && event.currentTarget) {
+        const rect = event.currentTarget.getBoundingClientRect();
+        x = rect.left + rect.width / 2;
+        y = rect.top - 8;
+      } else if (card) {
+        const rect = card.getBoundingClientRect();
+        x = rect.left + rect.width / 2;
+        y = rect.top + 28;
+      }
+
+      tag.style.left = `${Math.max(90, Math.min(window.innerWidth - 90, x))}px`;
+      tag.style.top = `${Math.max(24, y)}px`;
+
+      document.body.appendChild(tag);
+      setTimeout(() => tag.remove(), 860);
+    }
+
+    function addToCart(name, price, event) {
       const existing = cart.find(item => item.name === name);
       if (existing) {
         existing.qty += 1;
       } else {
         cart.push({ name, price, qty: 1 });
       }
-      renderCartBar();
-      renderSummary();
+      updateUI();
+      triggerCardEffect(name, event, true);
+    }
+
+    function removeOneFromCart(name, event) {
+      const index = cart.findIndex(item => item.name === name);
+      if (index === -1) return;
+
+      cart[index].qty -= 1;
+      if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
+      }
+
+      updateUI();
+      triggerCardEffect(name, event, false);
+      if (cart.length === 0) closeModal();
     }
 
     function changeQty(index, delta) {
       if (!cart[index]) return;
-      cart[index].qty += delta;
-      if (cart[index].qty <= 0) {
+      const item = cart[index];
+      item.qty += delta;
+      const wasAdd = delta > 0;
+      if (item.qty <= 0) {
         cart.splice(index, 1);
       }
-      renderCartBar();
-      renderSummary();
+      updateUI();
+      triggerCardEffect(item.name, null, wasAdd);
       if (cart.length === 0) closeModal();
     }
 
-    function removeItem(index) {
-      if (!cart[index]) return;
-      cart.splice(index, 1);
-      renderCartBar();
-      renderSummary();
-      if (cart.length === 0) closeModal();
-    }
-
-    function renderCartBar() {
+    function updateUI() {
       const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
       const count = cart.reduce((acc, item) => acc + item.qty, 0);
 
       document.getElementById('cart-total').innerText = 'R$ ' + total.toFixed(2).replace('.', ',');
       document.getElementById('cart-count').innerText = '(' + count + ' ' + (count === 1 ? 'item' : 'itens') + ')';
 
-      const listEl = document.getElementById('cart-items-list');
-      listEl.innerHTML = '';
-
-      if (cart.length === 0) {
-        listEl.classList.add('hidden');
-        return;
-      }
-
-      listEl.classList.remove('hidden');
-
-      cart.forEach((item, idx) => {
-        const line = document.createElement('div');
-        line.className = 'flex items-center justify-between bg-zinc-950/90 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs';
-
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'text-zinc-200 font-medium truncate';
-        nameSpan.textContent = `${item.qty}x ${item.name} — R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}`;
-
-        const controls = document.createElement('div');
-        controls.className = 'flex items-center gap-1.5 shrink-0';
-
-        const minusBtn = document.createElement('button');
-        minusBtn.type = 'button';
-        minusBtn.className = 'w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-white font-bold';
-        minusBtn.title = 'Diminuir quantidade';
-        minusBtn.textContent = '-';
-        minusBtn.onclick = () => changeQty(idx, -1);
-
-        const plusBtn = document.createElement('button');
-        plusBtn.type = 'button';
-        plusBtn.className = 'w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-white font-bold';
-        plusBtn.title = 'Aumentar quantidade';
-        plusBtn.textContent = '+';
-        plusBtn.onclick = () => changeQty(idx, 1);
-
-        const delBtn = document.createElement('button');
-        delBtn.type = 'button';
-        delBtn.className = 'w-6 h-6 rounded bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 font-bold flex items-center justify-center';
-        delBtn.title = 'Retirar item';
-        delBtn.innerHTML = '<i class="fa-solid fa-trash text-[11px]"></i>';
-        delBtn.onclick = () => removeItem(idx);
-
-        controls.append(minusBtn, plusBtn, delBtn);
-        line.append(nameSpan, controls);
-        listEl.appendChild(line);
+      document.querySelectorAll('[data-qty-badge]').forEach(badge => {
+        const name = badge.getAttribute('data-qty-badge');
+        const found = cart.find(i => i.name === name);
+        if (found && found.qty > 0) {
+          badge.textContent = `+${found.qty}`;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
       });
+
+      document.querySelectorAll('[data-remove-btn]').forEach(btn => {
+        const name = btn.getAttribute('data-remove-btn');
+        const found = cart.find(i => i.name === name);
+        btn.classList.toggle('hidden', !found || found.qty <= 0);
+      });
+
+      if (!document.getElementById('checkout-modal').classList.contains('hidden')) {
+        renderSummary();
+      }
     }
 
     function renderSummary() {
@@ -436,13 +613,7 @@
         plusBtn.textContent = '+';
         plusBtn.onclick = () => changeQty(idx, 1);
 
-        const delBtn = document.createElement('button');
-        delBtn.type = 'button';
-        delBtn.className = 'w-6 h-6 rounded bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 font-bold flex items-center justify-center';
-        delBtn.innerHTML = '<i class="fa-solid fa-trash text-[11px]"></i>';
-        delBtn.onclick = () => removeItem(idx);
-
-        right.append(sub, minusBtn, plusBtn, delBtn);
+        right.append(sub, minusBtn, plusBtn);
         row.append(left, right);
         container.appendChild(row);
       });
