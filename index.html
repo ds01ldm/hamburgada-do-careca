@@ -309,9 +309,46 @@
         <span id="cart-total" class="text-xl font-black text-amber-400">R$ 0,00</span>
         <span id="cart-count" class="text-xs text-zinc-500 ml-1">(0 itens)</span>
       </div>
-      <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-3 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95">
+      <button onclick="handleCheckoutClick()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-3 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95">
         <i class="fa-brands fa-whatsapp text-lg"></i> Finalizar Pedido
       </button>
+    </div>
+  </div>
+
+  <!-- MODAL UPSELL: POTINHO DE MAIONESE -->
+  <div id="mayo-upsell-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-zinc-900 border border-amber-500/40 w-full max-w-sm rounded-2xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <span class="inline-block bg-amber-500 text-black text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+            Turbina o lanche
+          </span>
+          <h3 class="text-lg font-extrabold text-white mt-1.5">Potinho de Maionese da Casa</h3>
+          <p class="text-xs text-zinc-400 mt-1">Potinho 100g • Deixa seu lanche ainda mais gostoso!</p>
+        </div>
+        <button type="button" onclick="proceedToCheckoutModal()" class="text-zinc-400 hover:text-white text-xl leading-none">&times;</button>
+      </div>
+
+      <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3.5 flex items-center justify-between">
+        <div>
+          <span class="text-xs text-zinc-400 block">Valor unitário</span>
+          <span class="text-lg font-black text-amber-400">R$ 3,00</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="stepUpsellQty(-1)" class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold">-</button>
+          <span id="upsell-qty" class="w-6 text-center text-sm font-extrabold text-white">1</span>
+          <button type="button" onclick="stepUpsellQty(1)" class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold">+</button>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <button type="button" onclick="confirmMayoUpsell()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-extrabold py-3 rounded-xl text-sm transition active:scale-95">
+          Adicionar <span id="upsell-btn-label">Potinho (+R$ 3,00)</span>
+        </button>
+        <button type="button" onclick="proceedToCheckoutModal()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold py-2.5 rounded-xl text-xs transition">
+          Não, continuar para finalizar
+        </button>
+      </div>
     </div>
   </div>
 
@@ -324,6 +361,17 @@
       </div>
 
       <div id="modal-summary" class="bg-zinc-950 p-3 rounded-xl text-xs space-y-2 text-zinc-300 border border-zinc-800"></div>
+
+      <!-- Atalho rápido para adicionar/aumentar maionese direto no checkout -->
+      <div id="checkout-mayo-box" class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 flex items-center justify-between gap-2">
+        <div class="text-xs">
+          <p class="font-bold text-amber-300">+ Maionese da Casa (100g)</p>
+          <p class="text-zinc-400">R$ 3,00 cada potinho</p>
+        </div>
+        <button type="button" onclick="addMayoFromCheckout(event)" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-3 py-1.5 rounded-lg text-xs transition shrink-0">
+          + R$ 3,00
+        </button>
+      </div>
 
       <div class="space-y-3">
         <div>
@@ -381,6 +429,20 @@
 
   <script>
     let cart = [];
+    let upsellQty = 1;
+    let upsellShownThisSession = false;
+
+    const MAYO_ITEM = {
+      name: 'Maionese da Casa (100g)',
+      price: 3.00
+    };
+
+    const BURGER_NAMES = [
+      'Hambúrguer do Chef',
+      'Hambúrguer do Careca',
+      'Hambúrguer Clássico',
+      'Carequinha Kids'
+    ];
 
     const itemThemes = {
       'Hambúrguer do Chef': { label: '🧀 Gorgonzola + Bacon + Cebola', border: 'border-amber-400', pill: 'bg-amber-500 text-black' },
@@ -388,7 +450,8 @@
       'Hambúrguer Clássico': { label: '🍔 Clássico Brioche + Maionese', border: 'border-yellow-400', pill: 'bg-yellow-400 text-black' },
       'Carequinha Kids': { label: '🍟 Kids + Fritas Crocantes', border: 'border-sky-400', pill: 'bg-sky-400 text-black' },
       'Guaraná 2L': { label: '🧊 Guaraná Geladão 2L', border: 'border-lime-400', pill: 'bg-lime-400 text-black' },
-      'Coca-Cola 2L': { label: '🧊 Coca Trincando 2L', border: 'border-rose-400', pill: 'bg-rose-500 text-white' }
+      'Coca-Cola 2L': { label: '🧊 Coca Trincando 2L', border: 'border-rose-400', pill: 'bg-rose-500 text-white' },
+      'Maionese da Casa (100g)': { label: '🧄 Maionese da Casa 100g', border: 'border-amber-400', pill: 'bg-amber-500 text-black' }
     };
 
     function formatBRL(val) {
@@ -490,12 +553,12 @@
       setTimeout(() => tag.remove(), 860);
     }
 
-    function addToCart(name, price, event) {
+    function addToCart(name, price, event, qtyToAdd = 1) {
       const existing = cart.find(item => item.name === name);
       if (existing) {
-        existing.qty += 1;
+        existing.qty += qtyToAdd;
       } else {
-        cart.push({ name, price, qty: 1 });
+        cart.push({ name, price, qty: qtyToAdd });
       }
       refreshUI();
       playVibe(name, event, true);
@@ -553,6 +616,59 @@
         renderSummary();
         updatePreview();
       }
+    }
+
+    function hasBurgerInCart() {
+      return cart.some(item => BURGER_NAMES.includes(item.name) && item.qty > 0);
+    }
+
+    function hasMayoInCart() {
+      return cart.some(item => item.name === MAYO_ITEM.name && item.qty > 0);
+    }
+
+    function handleCheckoutClick() {
+      if (cart.length === 0) {
+        alert('Selecione pelo menos um item do cardápio!');
+        return;
+      }
+
+      // Oferece o potinho antes de ir pro checkout quando há hambúrguer e ainda não tem maionese
+      if (hasBurgerInCart() && !hasMayoInCart() && !upsellShownThisSession) {
+        upsellShownThisSession = true;
+        upsellQty = 1;
+        syncUpsellUI();
+        document.getElementById('mayo-upsell-modal').classList.remove('hidden');
+        return;
+      }
+
+      proceedToCheckoutModal();
+    }
+
+    function stepUpsellQty(delta) {
+      upsellQty = Math.max(1, Math.min(10, upsellQty + delta));
+      syncUpsellUI();
+    }
+
+    function syncUpsellUI() {
+      document.getElementById('upsell-qty').textContent = String(upsellQty);
+      document.getElementById('upsell-btn-label').textContent =
+        `${upsellQty}x Potinho (+${formatBRL(MAYO_ITEM.price * upsellQty)})`;
+    }
+
+    function confirmMayoUpsell() {
+      addToCart(MAYO_ITEM.name, MAYO_ITEM.price, null, upsellQty);
+      proceedToCheckoutModal();
+    }
+
+    function addMayoFromCheckout(event) {
+      addToCart(MAYO_ITEM.name, MAYO_ITEM.price, event, 1);
+    }
+
+    function proceedToCheckoutModal() {
+      document.getElementById('mayo-upsell-modal').classList.add('hidden');
+      renderSummary();
+      updatePreview();
+      document.getElementById('checkout-modal').classList.remove('hidden');
     }
 
     function renderSummary() {
@@ -638,18 +754,9 @@
       }
     }
 
-    function openModal() {
-      if (cart.length === 0) {
-        alert('Selecione pelo menos um item do cardápio!');
-        return;
-      }
-      renderSummary();
-      updatePreview();
-      document.getElementById('checkout-modal').classList.remove('hidden');
-    }
-
     function closeModal() {
       document.getElementById('checkout-modal').classList.add('hidden');
+      document.getElementById('mayo-upsell-modal').classList.add('hidden');
     }
 
     function toggleAddress() {
