@@ -31,6 +31,18 @@
       100% { opacity: 0; transform: translate(-50%, -24px) scale(0.95); }
     }
 
+    @keyframes dropLayer {
+      0% { opacity: 0; transform: translateY(-90px) scale(0.94); }
+      72% { opacity: 1; transform: translateY(4px) scale(1.02); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes stackSettle {
+      0%, 78% { transform: scale(1); }
+      88% { transform: scale(1.03, 0.97); }
+      100% { transform: scale(1); }
+    }
+
     .pop-badge {
       animation: popBadge 0.28s ease-out;
     }
@@ -51,9 +63,92 @@
       box-shadow: 0 10px 24px rgba(0,0,0,0.5);
       animation: riseTag 0.85s ease-out forwards;
     }
+
+    .burger-stack-anim {
+      animation: stackSettle 5s ease-in-out forwards;
+    }
+
+    .layer-drop {
+      opacity: 0;
+      animation: dropLayer 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .layer-1 { animation-delay: 0.25s; }
+    .layer-2 { animation-delay: 0.90s; }
+    .layer-3 { animation-delay: 1.55s; }
+    .layer-4 { animation-delay: 2.20s; }
+    .layer-5 { animation-delay: 2.85s; }
+    .layer-6 { animation-delay: 3.50s; }
   </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen pb-28 font-sans selection:bg-amber-500 selection:text-black">
+
+  <!-- TELA DE ABERTURA (5s -> VAI PRO CARDÁPIO) -->
+  <div id="intro-splash" class="fixed inset-0 z-50 bg-white text-zinc-900 flex flex-col items-center justify-between px-5 py-7 transition-opacity duration-500">
+    <div class="text-center">
+      <span class="inline-block bg-amber-500 text-black text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full">
+        Hamburgada do Careca
+      </span>
+      <p class="text-xs text-zinc-500 font-medium mt-1.5">Montando o seu pedido em 5s...</p>
+    </div>
+
+    <div class="w-full max-w-2xl flex items-center justify-center my-auto">
+      <!-- Montagem camada por camada do hambúrguer -->
+      <div class="burger-stack-anim w-52 sm:w-64 flex flex-col items-center justify-end h-60 relative">
+        <svg viewBox="0 0 220 210" class="w-full h-full overflow-visible" aria-label="Hambúrguer montando camada por camada">
+          <!-- Prato / base -->
+          <ellipse cx="110" cy="188" rx="84" ry="12" fill="#e4e4e7" stroke="#d4d4d8" stroke-width="2" />
+
+          <!-- Camada 1: Pão base -->
+          <g class="layer-drop layer-1">
+            <path d="M36 164 H184 V175 C184 182 176 186 164 186 H56 C44 186 36 182 36 175 Z" fill="#d97706" stroke="#92400e" stroke-width="2" />
+            <path d="M44 177 H176" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" />
+          </g>
+
+          <!-- Camada 2: Carne bovina -->
+          <g class="layer-drop layer-2">
+            <rect x="34" y="144" width="152" height="20" rx="10" fill="#5c2c16" stroke="#3b190a" stroke-width="2" />
+            <path d="M48 151 Q72 156 96 150 T144 152 T172 150" fill="none" stroke="#7c3f22" stroke-width="2" stroke-linecap="round" />
+          </g>
+
+          <!-- Camada 3: Queijo cheddar derretendo -->
+          <g class="layer-drop layer-3">
+            <path d="M32 135 H188 L178 145 L164 154 L152 145 L118 145 L106 156 L94 145 L42 145 Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.8" stroke-linejoin="round" />
+          </g>
+
+          <!-- Camada 4: Bacon crocante -->
+          <g class="layer-drop layer-4">
+            <path d="M38 124 Q58 117 78 125 T118 125 T158 125 T182 123 L178 134 Q156 137 136 131 T96 132 T56 133 L36 131 Z" fill="#b91c1c" stroke="#7f1d1d" stroke-width="1.6" />
+            <path d="M46 128 Q68 123 90 128 T134 128 T172 127" fill="none" stroke="#fca5a5" stroke-width="2" stroke-linecap="round" />
+          </g>
+
+          <!-- Camada 5: Alface e tomate -->
+          <g class="layer-drop layer-5">
+            <path d="M34 114 Q48 105 64 114 T94 114 T124 114 T154 114 T186 114 L180 123 H40 Z" fill="#22c55e" stroke="#15803d" stroke-width="1.6" />
+            <ellipse cx="78" cy="116" rx="18" ry="4.5" fill="#ef4444" />
+            <ellipse cx="144" cy="116" rx="18" ry="4.5" fill="#ef4444" />
+          </g>
+
+          <!-- Camada 6: Pão superior com gergelim -->
+          <g class="layer-drop layer-6">
+            <path d="M35 106 C35 64, 68 42, 110 42 C152 42, 185 64, 185 106 Z" fill="#f59e0b" stroke="#b45309" stroke-width="2" />
+            <path d="M52 72 C72 52, 108 48, 134 54" fill="none" stroke="#fde68a" stroke-width="4" stroke-linecap="round" opacity="0.75" />
+            <ellipse cx="82" cy="74" rx="4" ry="2" transform="rotate(-18 82 74)" fill="#fef3c7" />
+            <ellipse cx="110" cy="64" rx="4" ry="2" transform="rotate(8 110 64)" fill="#fef3c7" />
+            <ellipse cx="138" cy="75" rx="4" ry="2" transform="rotate(20 138 75)" fill="#fef3c7" />
+            <ellipse cx="96" cy="88" rx="4" ry="2" transform="rotate(-10 96 88)" fill="#fef3c7" />
+            <ellipse cx="126" cy="87" rx="4" ry="2" transform="rotate(14 126 87)" fill="#fef3c7" />
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <button type="button" onclick="finishIntroNow()" class="text-xs font-bold text-zinc-500 hover:text-zinc-900 underline underline-offset-4 transition">
+        Ir direto pro cardápio
+      </button>
+    </div>
+  </div>
 
   <!-- Header -->
   <header class="relative bg-zinc-900 border-b border-zinc-800">
@@ -452,6 +547,7 @@
     let upsellShownThisSession = false;
     let distanceTimer = null;
     let lastLookupKey = '';
+    let introTimeout = null;
 
     // Coordenadas aproximadas da loja: Rua 6 de Novembro, 660 - Mário Quintana, Porto Alegre - RS
     const STORE_COORDS = {
@@ -487,6 +583,25 @@
       status: 'idle',
       message: 'Até 5 km: R$ 6,00 • Acima de 5 km: +R$ 1,30/km (estimativa por mapa).'
     };
+
+    function finishIntroNow() {
+      if (introTimeout) {
+        clearTimeout(introTimeout);
+        introTimeout = null;
+      }
+      const splash = document.getElementById('intro-splash');
+      if (!splash || splash.classList.contains('hidden')) return;
+      splash.classList.add('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        splash.classList.add('hidden');
+      }, 450);
+    }
+
+    function startIntroTimer() {
+      introTimeout = setTimeout(() => {
+        finishIntroNow();
+      }, 5000);
+    }
 
     function formatBRL(val) {
       return 'R$ ' + Number(val || 0).toFixed(2).replace('.', ',');
@@ -1040,6 +1155,7 @@
     }
 
     updateOpenStatus();
+    startIntroTimer();
   </script>
 </body>
 </html>
