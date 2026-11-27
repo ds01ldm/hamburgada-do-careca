@@ -283,6 +283,10 @@
             <i class="fa-solid fa-phone text-amber-500"></i>
             <span>(51) 9816-3012</span>
           </p>
+          <p class="flex items-start gap-2">
+            <i class="fa-solid fa-motorcycle text-amber-500 mt-0.5"></i>
+            <span>Tele-entrega: R$ 6,00 até 5 km + R$ 1,30 por km adicional (estimativa pelo mapa).</span>
+          </p>
         </div>
 
         <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 text-center space-y-2 mt-4">
@@ -305,7 +309,7 @@
   <div id="cart-bar" class="fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur border-t border-zinc-800 p-4 shadow-2xl z-40">
     <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
       <div>
-        <span class="text-xs text-zinc-400 block">Total do Pedido</span>
+        <span class="text-xs text-zinc-400 block">Subtotal dos Itens</span>
         <span id="cart-total" class="text-xl font-black text-amber-400">R$ 0,00</span>
         <span id="cart-count" class="text-xs text-zinc-500 ml-1">(0 itens)</span>
       </div>
@@ -343,7 +347,7 @@
 
       <div class="space-y-2">
         <button type="button" onclick="confirmMayoUpsell()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-extrabold py-3 rounded-xl text-sm transition active:scale-95">
-          Adicionar <span id="upsell-btn-label">Potinho (+R$ 3,00)</span>
+          Adicionar <span id="upsell-btn-label">1x Potinho (+R$ 3,00)</span>
         </button>
         <button type="button" onclick="proceedToCheckoutModal()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold py-2.5 rounded-xl text-xs transition">
           Não, continuar para finalizar
@@ -381,15 +385,30 @@
 
         <div>
           <label class="text-xs font-semibold text-zinc-400 block mb-1">Tipo de Pedido</label>
-          <select id="order-type" onchange="toggleAddress(); updatePreview();" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+          <select id="order-type" onchange="handleOrderTypeChange()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
             <option value="Entrega">Entrega (Tele-entrega)</option>
             <option value="Retirada">Retirada no Local</option>
           </select>
         </div>
 
-        <div id="address-group">
-          <label class="text-xs font-semibold text-zinc-400 block mb-1">Endereço de Entrega com Número *</label>
-          <input type="text" id="cust-address" oninput="updatePreview()" placeholder="Ex: Rua Pedro Nelo Antunes, 123" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+        <div id="address-group" class="space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <label class="text-xs font-semibold text-zinc-400 block">Endereço de Entrega com Número *</label>
+            <button type="button" onclick="scheduleDistanceLookup(true)" class="text-[11px] font-bold text-amber-400 hover:text-amber-300">
+              Calcular tele
+            </button>
+          </div>
+          <input type="text" id="cust-address" oninput="handleAddressInput()" placeholder="Ex: Rua Pedro Nelo Antunes, 123" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+
+          <div id="delivery-quote-box" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-xs space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-zinc-400">Taxa de tele-entrega:</span>
+              <span id="delivery-fee-label" class="font-extrabold text-amber-400">Informe o endereço</span>
+            </div>
+            <p id="delivery-status-text" class="text-[11px] text-zinc-500">
+              Até 5 km: R$ 6,00 • Acima de 5 km: +R$ 1,30/km (estimativa por mapa).
+            </p>
+          </div>
         </div>
 
         <div>
@@ -431,6 +450,14 @@
     let cart = [];
     let upsellQty = 1;
     let upsellShownThisSession = false;
+    let distanceTimer = null;
+    let lastLookupKey = '';
+
+    // Coordenadas aproximadas da loja: Rua 6 de Novembro, 660 - Mário Quintana, Porto Alegre - RS
+    const STORE_COORDS = {
+      lat: -30.0085,
+      lon: -51.1195
+    };
 
     const MAYO_ITEM = {
       name: 'Maionese da Casa (100g)',
@@ -454,6 +481,13 @@
       'Maionese da Casa (100g)': { label: '🧄 Maionese da Casa 100g', border: 'border-amber-400', pill: 'bg-amber-500 text-black' }
     };
 
+    let deliveryState = {
+      distanceKm: null,
+      fee: null,
+      status: 'idle',
+      message: 'Até 5 km: R$ 6,00 • Acima de 5 km: +R$ 1,30/km (estimativa por mapa).'
+    };
+
     function formatBRL(val) {
       return 'R$ ' + Number(val || 0).toFixed(2).replace('.', ',');
     }
@@ -467,6 +501,164 @@
 
     function hasAddressNumber(address) {
       return /\d+/.test(address);
+    }
+
+    function calculateDeliveryFee(km) {
+      if (km === null || !Number.isFinite(km) || km < 0) return null;
+      if (km <= 5) return 6.00;
+      const extraKm = km - 5;
+      return Number((6.00 + extraKm * 1.30).toFixed(2));
+    }
+
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const toRad = deg => (deg * Math.PI) / 180;
+      const R = 6371;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function getActiveDeliveryFee() {
+      const type = document.getElementById('order-type').value;
+      if (type === 'Retirada') return 0;
+      return typeof deliveryState.fee === 'number' ? deliveryState.fee : 0;
+    }
+
+    function renderDeliveryBox() {
+      const type = document.getElementById('order-type').value;
+      const feeLabel = document.getElementById('delivery-fee-label');
+      const statusText = document.getElementById('delivery-status-text');
+
+      if (type === 'Retirada') {
+        feeLabel.textContent = 'R$ 0,00 (Retirada)';
+        statusText.textContent = 'Retirada no local: sem taxa de tele-entrega.';
+        return;
+      }
+
+      if (deliveryState.status === 'loading') {
+        feeLabel.textContent = 'Calculando...';
+        statusText.textContent = 'Buscando distância a partir do Mário Quintana, Porto Alegre...';
+        return;
+      }
+
+      if (deliveryState.status === 'ready' && deliveryState.distanceKm !== null && deliveryState.fee !== null) {
+        feeLabel.textContent = `${formatBRL(deliveryState.fee)} (~${deliveryState.distanceKm.toFixed(1).replace('.', ',')} km)`;
+        statusText.textContent = deliveryState.message;
+        return;
+      }
+
+      feeLabel.textContent = 'Aguardando endereço';
+      statusText.textContent = deliveryState.message;
+    }
+
+    async function lookupAddressDistance(rawAddress) {
+      const cleaned = rawAddress.trim();
+      const query = `${cleaned}, Porto Alegre, Rio Grande do Sul, Brasil`;
+
+      if (query === lastLookupKey && deliveryState.status === 'ready') {
+        renderDeliveryBox();
+        updatePreview();
+        return;
+      }
+
+      deliveryState.status = 'loading';
+      renderDeliveryBox();
+
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&q=${encodeURIComponent(query)}`;
+        const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        if (!resp.ok) throw new Error('Falha na consulta');
+        const results = await resp.json();
+
+        if (!Array.isArray(results) || results.length === 0) {
+          deliveryState = {
+            distanceKm: null,
+            fee: null,
+            status: 'error',
+            message: 'Não localizamos o endereço exato. Confira rua, número e bairro (ex.: Rua ..., 123).'
+          };
+          renderDeliveryBox();
+          updatePreview();
+          return;
+        }
+
+        const destLat = parseFloat(results[0].lat);
+        const destLon = parseFloat(results[0].lon);
+        const km = haversineKm(STORE_COORDS.lat, STORE_COORDS.lon, destLat, destLon);
+        const fee = calculateDeliveryFee(km);
+
+        lastLookupKey = query;
+        deliveryState = {
+          distanceKm: km,
+          fee,
+          status: 'ready',
+          message: km <= 5
+            ? 'Dentro de até 5 km: taxa fixa de R$ 6,00 (estimativa por mapa).'
+            : `Acima de 5 km (${(km - 5).toFixed(1).replace('.', ',')} km extras × R$ 1,30; estimativa por mapa).`
+        };
+      } catch (err) {
+        deliveryState = {
+          distanceKm: null,
+          fee: null,
+          status: 'error',
+          message: 'Não foi possível calcular agora. A taxa final será conferida no WhatsApp.'
+        };
+      }
+
+      renderDeliveryBox();
+      updatePreview();
+    }
+
+    function scheduleDistanceLookup(immediate = false) {
+      const type = document.getElementById('order-type').value;
+      const address = document.getElementById('cust-address').value.trim();
+
+      if (distanceTimer) {
+        clearTimeout(distanceTimer);
+        distanceTimer = null;
+      }
+
+      if (type !== 'Entrega') {
+        renderDeliveryBox();
+        updatePreview();
+        return;
+      }
+
+      if (address.length < 6 || !hasAddressNumber(address)) {
+        deliveryState = {
+          distanceKm: null,
+          fee: null,
+          status: 'idle',
+          message: 'Digite a rua e o número para calcular a tele (R$ 6,00 até 5 km + R$ 1,30/km extra).'
+        };
+        renderDeliveryBox();
+        updatePreview();
+        return;
+      }
+
+      if (immediate) {
+        lookupAddressDistance(address);
+      } else {
+        distanceTimer = setTimeout(() => {
+          lookupAddressDistance(address);
+        }, 650);
+      }
+    }
+
+    function handleAddressInput() {
+      scheduleDistanceLookup(false);
+      updatePreview();
+    }
+
+    function handleOrderTypeChange() {
+      toggleAddress();
+      scheduleDistanceLookup(true);
+      updatePreview();
     }
 
     function getCardByName(name) {
@@ -586,10 +778,10 @@
     }
 
     function refreshUI() {
-      const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+      const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
       const count = cart.reduce((acc, item) => acc + item.qty, 0);
 
-      document.getElementById('cart-total').innerText = formatBRL(total);
+      document.getElementById('cart-total').innerText = formatBRL(subtotal);
       document.getElementById('cart-count').innerText = '(' + count + ' ' + (count === 1 ? 'item' : 'itens') + ')';
 
       document.querySelectorAll('[data-item]').forEach(card => {
@@ -614,6 +806,7 @@
 
       if (!document.getElementById('checkout-modal').classList.contains('hidden')) {
         renderSummary();
+        renderDeliveryBox();
         updatePreview();
       }
     }
@@ -632,7 +825,6 @@
         return;
       }
 
-      // Oferece o potinho antes de ir pro checkout quando há hambúrguer e ainda não tem maionese
       if (hasBurgerInCart() && !hasMayoInCart() && !upsellShownThisSession) {
         upsellShownThisSession = true;
         upsellQty = 1;
@@ -667,6 +859,7 @@
     function proceedToCheckoutModal() {
       document.getElementById('mayo-upsell-modal').classList.add('hidden');
       renderSummary();
+      renderDeliveryBox();
       updatePreview();
       document.getElementById('checkout-modal').classList.remove('hidden');
     }
@@ -675,9 +868,13 @@
       const container = document.getElementById('modal-summary');
       container.innerHTML = '<p class="font-bold text-amber-400 mb-1">Itens Selecionados:</p>';
 
+      let subtotal = 0;
       cart.forEach((item, idx) => {
+        const sub = item.price * item.qty;
+        subtotal += sub;
+
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between gap-2 py-1 border-b border-zinc-800/60 last:border-b-0';
+        row.className = 'flex items-center justify-between gap-2 py-1 border-b border-zinc-800/60';
 
         const left = document.createElement('span');
         left.textContent = `${item.qty}x ${item.name}`;
@@ -685,9 +882,9 @@
         const right = document.createElement('div');
         right.className = 'flex items-center gap-1.5';
 
-        const sub = document.createElement('span');
-        sub.className = 'font-semibold text-white mr-1';
-        sub.textContent = formatBRL(item.price * item.qty);
+        const subEl = document.createElement('span');
+        subEl.className = 'font-semibold text-white mr-1';
+        subEl.textContent = formatBRL(sub);
 
         const minusBtn = document.createElement('button');
         minusBtn.type = 'button';
@@ -701,10 +898,30 @@
         plusBtn.textContent = '+';
         plusBtn.onclick = () => changeQty(idx, 1);
 
-        right.append(sub, minusBtn, plusBtn);
+        right.append(subEl, minusBtn, plusBtn);
         row.append(left, right);
         container.appendChild(row);
       });
+
+      const type = document.getElementById('order-type').value;
+      const fee = getActiveDeliveryFee();
+      const totalGeral = subtotal + fee;
+
+      const feeRow = document.createElement('div');
+      feeRow.className = 'flex items-center justify-between pt-1.5 text-zinc-300';
+      feeRow.innerHTML = `
+        <span>Tele-entrega${type === 'Entrega' && deliveryState.distanceKm !== null ? ` (~${deliveryState.distanceKm.toFixed(1).replace('.', ',')} km)` : ''}:</span>
+        <span class="font-bold text-amber-400">${type === 'Retirada' ? 'R$ 0,00' : (deliveryState.status === 'ready' ? formatBRL(fee) : 'A calcular')}</span>
+      `;
+
+      const totalRow = document.createElement('div');
+      totalRow.className = 'flex items-center justify-between pt-1.5 border-t border-zinc-800 text-sm font-extrabold text-white';
+      totalRow.innerHTML = `
+        <span>Total Geral:</span>
+        <span class="text-emerald-400">${formatBRL(totalGeral)}</span>
+      `;
+
+      container.append(feeRow, totalRow);
     }
 
     function buildWhatsAppMessage() {
@@ -715,24 +932,35 @@
       const changeRaw = document.getElementById('cust-change').value.trim();
       const obs = document.getElementById('cust-obs').value.trim();
 
-      let total = 0;
+      let subtotal = 0;
       const itemsLines = cart.map(item => {
         const sub = item.price * item.qty;
-        total += sub;
+        subtotal += sub;
         return `• ${item.qty}x ${item.name} — ${formatBRL(sub)}`;
       });
+
+      const fee = getActiveDeliveryFee();
+      const totalGeral = subtotal + fee;
 
       let msg = "🍔 *PEDIDO - HAMBURGADA DO CARECA*\n";
       msg += "Fala, Careca! Segue meu pedido:\n\n";
       msg += "*Cliente:* " + name + "\n";
       msg += "*Modalidade:* " + type + "\n";
-      if (type === 'Entrega') msg += "*Endereço:* " + address + "\n";
+      if (type === 'Entrega') {
+        msg += "*Endereço:* " + address + "\n";
+        if (deliveryState.status === 'ready' && deliveryState.distanceKm !== null) {
+          msg += `*Distância estimada:* ${deliveryState.distanceKm.toFixed(1).replace('.', ',')} km\n`;
+          msg += `*Tele-entrega:* ${formatBRL(fee)}\n`;
+        } else {
+          msg += "*Tele-entrega:* A conferir\n";
+        }
+      }
       msg += "*Pagamento:* " + pay + "\n";
 
       if (pay === 'Dinheiro' && changeRaw) {
         const changeNum = parseMoneyInput(changeRaw);
-        if (changeNum !== null && changeNum >= total) {
-          const troco = changeNum - total;
+        if (changeNum !== null && changeNum >= totalGeral) {
+          const troco = changeNum - totalGeral;
           msg += `*Troco para:* ${formatBRL(changeNum)} (troco aprox. ${formatBRL(troco)})\n`;
         } else {
           msg += "*Troco:* " + changeRaw + "\n";
@@ -742,7 +970,11 @@
       if (obs) msg += "*Observações:* " + obs + "\n";
 
       msg += "\n*Itens:*\n" + itemsLines.join("\n") + "\n";
-      msg += "\n*Subtotal dos itens:* " + formatBRL(total);
+      msg += "\n*Subtotal dos itens:* " + formatBRL(subtotal);
+      if (type === 'Entrega') {
+        msg += "\n*Tele-entrega:* " + (deliveryState.status === 'ready' ? formatBRL(fee) : 'A conferir');
+      }
+      msg += "\n*Total:* " + formatBRL(totalGeral);
 
       return msg;
     }
